@@ -51,27 +51,33 @@ Add this plugin package to the Paperless Python environment from GitHub:
 
 ```nix
 { pkgs, lib, ... }:
-let
-  paperlessGenericFileParser =
-    pkgs.paperless-ngx.python.pkgs.callPackage
-      (pkgs.fetchFromGitHub {
-        owner = "phryneas";
-        repo = "paperless-generic-file-parser";
-        rev = "REPLACE_WITH_COMMIT_OR_TAG";
-        hash = "sha256-REPLACE_WITH_NIX_HASH";
-      })
-      { };
-
-  paperlessWithGenericFileParser = pkgs.paperless-ngx.overridePythonAttrs (old: {
-    dependencies = (old.dependencies or [ ]) ++ [ paperlessGenericFileParser ];
-    propagatedBuildInputs =
-      (old.propagatedBuildInputs or [ ]) ++ [ paperlessGenericFileParser ];
-  });
-in
 {
   services.paperless = {
     enable = true;
-    package = paperlessWithGenericFileParser;
+    package =
+      let
+        paperlessGenericFileParser =
+          pkgs.paperless-ngx.python.pkgs.callPackage
+            (pkgs.fetchFromGitHub {
+              owner = "phryneas";
+              repo = "paperless-generic-file-parser";
+              rev = "REPLACE_WITH_COMMIT_OR_TAG";
+              hash = "sha256-REPLACE_WITH_NIX_HASH";
+            })
+            { };
+
+        addGenericFileParser = pkg:
+          pkg.overridePythonAttrs (old: {
+            dependencies = (old.dependencies or [ ]) ++ [ paperlessGenericFileParser ];
+            propagatedBuildInputs =
+              (old.propagatedBuildInputs or [ ]) ++ [ paperlessGenericFileParser ];
+          });
+
+        pkg = addGenericFileParser pkgs.paperless-ngx;
+      in
+      pkg // {
+        override = args: addGenericFileParser (pkgs.paperless-ngx.override args);
+      };
   };
 }
 ```

@@ -1,17 +1,22 @@
-{ lib, python3Packages }:
+{
+  lib,
+  buildPythonPackage,
+  setuptools,
+  pillow,
+}:
 
-python3Packages.buildPythonPackage {
+buildPythonPackage {
   pname = "paperless-generic-file-parser";
   version = "0.1.0";
   pyproject = true;
   src = lib.cleanSource ./.;
 
   build-system = [
-    python3Packages.setuptools
+    setuptools
   ];
 
   dependencies = [
-    python3Packages.pillow
+    pillow
   ];
 
   pythonImportsCheck = [
