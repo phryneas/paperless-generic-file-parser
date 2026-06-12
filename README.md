@@ -54,6 +54,8 @@ Add this plugin package to the Paperless Python environment from GitHub:
 {
   services.paperless = {
     enable = true;
+    settings.PAPERLESS_APPS =
+      "paperless_generic_file_parser.apps.PaperlessGenericFileParserConfig";
     package =
       let
         paperlessGenericFileParser =
